@@ -135,9 +135,9 @@ async def hourdatarequesting():
             for i in fr:
                 if i.split(":")[2][:-1] == str(1):
                     await sendhourdata(i.split(":")[0], i.split(":")[1])
-                    await asyncio.sleep(60)
+                    await asyncio.sleep(3600)
                 else:
-                    await asyncio.sleep(60)
+                    await asyncio.sleep(3600)
                     return 1
 
 async def sendhourdata(uid, streetid):
