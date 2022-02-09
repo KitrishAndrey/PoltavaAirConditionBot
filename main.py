@@ -1,5 +1,5 @@
-import io
 import asyncio
+import DBRequest
 import Requesttopage
 import StreetMessageText
 from aiogram import Bot, Dispatcher, executor, types
@@ -51,98 +51,26 @@ onofmenu.add(removesignal)
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
+DB = DBRequest
 
 # starting bot
 
-def ustreet(uid, streetid):
-    try:
-        with open("utreetid.txt", "r") as file:
-            f =file.readlines()
-        with open("utreetid.txt", "r") as file:
-            if f[len(f) - 1] == str("\n"):
-                f.remove(str("\n"))
-                n = file.read()
-                n = n.replace("{0}".format(n), '{0}'.format(''.join(f)))
-                file.write(n)
-
-        with open("utreetid.txt", "r+") as file:
-            fel = file.readlines()
-            arrid = [int(i.split(":")[0]) for i in fel]
-            if int(uid) not in arrid:
-                file.writelines("{0}:{1}\n".format(uid, streetid))
-
-        with open("utreetid.txt", "r") as file:
-            x = file.read()
-        with open("utreetid.txt", "r+") as file:
-            for i in fel:
-                if i.startswith(str(uid)):
-                    x = x.replace("{0}".format(i), "{0}:{1}\n".format(uid, streetid))
-                    file.write(x)
-                else:
-                    return 0
-    except Exception as e:
-        print(repr(e))
-
-def getuserprimestreet(uid):
-    with open("utreetid.txt", "r+") as file:
-        fel = file.readlines()
-        for i in fel:
-            if i.startswith(str(uid)):
-                return str(i.split(":")[1][:-1])
-
-def writestate(uid, streetid, state):
-    try:
-        with open("uid.txt", "r+") as f:
-            fr = f.readlines()
-            for i in fr:
-                arrid = [i.split(":")[0]]
-            if str(uid) not in arrid:
-                f.writelines("{0}:{1}:{2}\n".format(uid, streetid, state))
-                f.close()
-
-        with open("uid.txt", "r") as file:
-            x = file.read()
-        with io.open("uid.txt", "r+") as file:
-            for i in fr:
-                if i.startswith(str(uid)):
-                    x = x.replace("{0}".format(i), "{0}:{1}:{2}\n".format(uid, streetid, state))
-                    file.write(x)
-                else:
-                    return 0
-    except Exception as e:
-        print(repr(e))
-
-async def changestate(uid):
-    try:
-        with open("uid.txt", "r+") as f:
-            fr = f.readlines()
-        with open("uid.txt", "r") as file:
-            x = file.read()
-        with io.open("uid.txt", "r+") as file:
-            for i in fr:
-                if i.startswith(str(uid)):
-                    x = x.replace("{0}".format(i), "{0}:{1}:{2}".format(i.split(":")[0], i.split(":")[1], 0))
-                    file.write(x)
-                else:
-                    return 0
-    except Exception as e:
-        print(repr(e))
-
 async def hourdatarequesting():
     while True:
-        with open("uid.txt", "r+") as f:
-            fr = f.readlines()
-            for i in fr:
-                if i.split(":")[2][:-1] == str(1):
-                    await sendhourdata(i.split(":")[0], i.split(":")[1])
-                    await asyncio.sleep(3600)
-                else:
-                    await asyncio.sleep(3600)
-                    return 1
+        fr = DB.get_uid_streetid_state_array()
+        print(fr)
+        for p in fr:
+            if "{0}".format(p.split(":")[2]) == "1":
+                print(p.split(":")[0])
+                print(p.split(":")[1])
+                await sendhourdata(p.split(":")[0], p.split(":")[1])
+                print("Function required")
+        await asyncio.sleep(3600)
+    return 1
 
 async def sendhourdata(uid, streetid):
     if streetid == "shkilny":
-        ustreet(uid, "shkilny")
+        DB.push_uid_streetid(uid, "shkilny")
         message_text = Requesttopage.main("shkilny")
         street = "Шкільний провулок"
         AQI = float(message_text[0])
@@ -164,7 +92,7 @@ async def sendhourdata(uid, streetid):
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "pushki":
-        ustreet(uid, "pushki")
+        DB.push_uid_streetid(uid, "pushki")
         message_text = Requesttopage.main("pushkinska")
         street = "вул. Пушкіна"
         AQIPUSH = float(message_text[0])
@@ -185,9 +113,8 @@ async def sendhourdata(uid, streetid):
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
-
     elif streetid == "petryu":
-        ustreet(uid, "petryu")
+        DB.push_uid_streetid(uid, "petryu")
         message_text = Requesttopage.main("petryur")
         street = "вул. Петра Юрченка"
         AQI = float(message_text[0])
@@ -209,7 +136,7 @@ async def sendhourdata(uid, streetid):
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "shevch":
-        ustreet(uid, "shevch")
+        DB.push_uid_streetid(uid, "shevch")
         message_text = Requesttopage.main("shevchenka")
         street = "вул. Шевченка"
         AQI = float(message_text[0])
@@ -231,7 +158,7 @@ async def sendhourdata(uid, streetid):
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "gromad":
-        ustreet(uid, "gromad")
+        DB.push_uid_streetid(uid, "gromad")
         message_text = Requesttopage.main("gromad")
         street = "вул. Громадська"
         AQI = float(message_text[0])
@@ -253,7 +180,7 @@ async def sendhourdata(uid, streetid):
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "velyko":
-        ustreet(uid, "velyko")
+        DB.push_uid_streetid(uid, "velyko")
         message_text = Requesttopage.main("velykotyr")
         street = "вул. Великотирнівська"
         AQI = float(message_text[0])
@@ -330,7 +257,7 @@ async def call_back_air():
 @dp.callback_query_handler(lambda c: c.data == "primedata")
 async def call_back_primedata(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    state = getuserprimestreet(call.from_user.id)
+    state = DB.get_prime_streetid(call.from_user.id)
     if state == "shkilny":
         street = "Шкліьний провулок"
         streetid = "shkilny"
@@ -364,7 +291,7 @@ async def call_back_primedata(call: types.CallbackQuery):
 
 @dp.callback_query_handler(lambda c: c.data == "street")
 async def call_back_primedata(call: types.CallbackQuery):
-    state = getuserprimestreet(call.from_user.id)
+    state = DB.get_prime_streetid(call.from_user.id)
     await bot.send_chat_action(call.from_user.id, "typing")
     if state == "shkilny":
         await call_back_streetshkil(call)
@@ -382,43 +309,43 @@ async def call_back_primedata(call: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data == "hourdata")
 async def call_back_hourdata(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    state = getuserprimestreet(call.from_user.id)
+    state = DB.get_prime_streetid(call.from_user.id)
     if state == "shkilny":
         streetid = "shkilny"
-        writestate(call.from_user.id, streetid, 1)
+        DB.push_hour_state(call.from_user.id, streetid, 1)
     elif state == "pushki":
         streetid = "pushki"
         await bot.answer_callback_query(call.id)
-        writestate(call.from_user.id, streetid, 1)
+        DB.push_hour_state(call.from_user.id, streetid, 1)
     elif state == "petryu":
         streetid = "petryu"
         await bot.answer_callback_query(call.id)
-        writestate(call.from_user.id, streetid, 1)
+        DB.push_hour_state(call.from_user.id, streetid, 1)
     elif state == "shevch":
         streetid = "shevch"
         await bot.answer_callback_query(call.id)
-        writestate(call.from_user.id, streetid, 1)
+        DB.push_hour_state(call.from_user.id, streetid, 1)
     elif state == "gromad":
         streetid = "gromad"
         await bot.answer_callback_query(call.id)
-        writestate(call.from_user.id, streetid, 1)
+        DB.push_hour_state(call.from_user.id, streetid, 1)
     elif state == "velyko":
         streetid = "velyko"
         await bot.answer_callback_query(call.id)
-        writestate(call.from_user.id, streetid, 1)
+        DB.push_hour_state(call.from_user.id, streetid, 1)
     await bot.answer_callback_query(call.id)
     await bot.send_message(call.from_user.id, "🖥⏰📡Що годинне оповіщення увімкнуте📡⏰🖥", reply_markup=onofmenu)
 
 @dp.callback_query_handler(lambda c: c.data == "removesignal")
 async def call_back_remove_signals(call: types.CallbackQuery):
-    await changestate(call.from_user.id)
+    DB.push_zero_state(call.from_user.id)
     await bot.answer_callback_query(call.id)
     await bot.send_message(call.from_user.id, "🖥⏰📡Що годинне оповіщення вимкнуте📡⏰🖥")
 
 @dp.callback_query_handler(lambda c: c.data =="shkilny")
 async def call_back_streetshkil(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    ustreet(call.from_user.id, "shkilny")
+    DB.push_uid_streetid(call.from_user.id, "shkilny")
     message_text = Requesttopage.main("shkilny")
     street = "Шкільний провулок"
     AQI = float(message_text[0])
@@ -439,7 +366,7 @@ async def call_back_streetshkil(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 300:
+    elif AQI >= 200 and AQI <= 500:
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
@@ -447,7 +374,7 @@ async def call_back_streetshkil(call: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data =="pushkinska")
 async def call_back_streetspushkin(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    ustreet(call.from_user.id, "pushki")
+    DB.push_uid_streetid(call.from_user.id, "pushki")
     message_text = Requesttopage.main("pushkinska")
     street = "вул. Пушкіна"
     AQIPUSH = float(message_text[0])
@@ -468,7 +395,7 @@ async def call_back_streetspushkin(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQIPUSH >= 200 and AQIPUSH <= 300:
+    elif AQIPUSH >= 200 and AQIPUSH <= 500:
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
@@ -476,7 +403,7 @@ async def call_back_streetspushkin(call: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data =="petryur")
 async def call_back_streetpetr(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    ustreet(call.from_user.id, "petryu")
+    DB.push_uid_streetid(call.from_user.id, "petryu")
     message_text = Requesttopage.main("petryur")
     street = "вул. Петра Юрченка"
     AQI = float(message_text[0])
@@ -498,16 +425,15 @@ async def call_back_streetpetr(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 300:
+    elif AQI >= 200 and AQI <= 500:
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
-
 @dp.callback_query_handler(lambda c: c.data =="shevchenka")
 async def call_back_streetshevchenka(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    ustreet(call.from_user.id, "shevch")
+    DB.push_uid_streetid(call.from_user.id, "shevch")
     message_text = Requesttopage.main("shevchenka")
     street = "вул. Шевченка"
     AQI = float(message_text[0])
@@ -528,7 +454,7 @@ async def call_back_streetshevchenka(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 300:
+    elif AQI >= 200 and AQI <= 500:
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
@@ -536,7 +462,7 @@ async def call_back_streetshevchenka(call: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data =="gromad")
 async def call_back_streetsgromad(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    ustreet(call.from_user.id, "gromad")
+    DB.push_uid_streetid(call.from_user.id, "gromad")
     message_text = Requesttopage.main("gromad")
     street = "вул. Громадська"
     AQI = float(message_text[0])
@@ -557,7 +483,7 @@ async def call_back_streetsgromad(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 300:
+    elif AQI >= 200 and AQI <= 500:
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
@@ -565,7 +491,7 @@ async def call_back_streetsgromad(call: types.CallbackQuery):
 @dp.callback_query_handler(lambda c: c.data =="velykotyr")
 async def call_back_streetsvelykotyr(call: types.CallbackQuery):
     await bot.send_chat_action(call.from_user.id, "typing")
-    ustreet(call.from_user.id, "velyko")
+    DB.push_uid_streetid(call.from_user.id, "velyko")
     message_text = Requesttopage.main("velykotyr")
     street = "вул. Великотирнівська"
     AQI = float(message_text[0])
@@ -586,7 +512,7 @@ async def call_back_streetsvelykotyr(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 300:
+    elif AQI >= 200 and AQI <= 500:
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
@@ -608,7 +534,6 @@ async def la_la_la(message):
             await bot.send_chat_action(message.chat.id, "typing")
             await bot.send_message(message.chat.id, "Нажаль, бот не сприймає такий вид повідомлень📥😕\n"
                                                     "Будь ласка, використовуйте меню та відповідні кнопки📲🙂")
-
 
 async def on_startup(x):
   asyncio.create_task(hourdatarequesting())
