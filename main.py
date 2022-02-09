@@ -83,8 +83,8 @@ async def sendhourdata(uid, streetid):
         elif AQI >= 151 and AQI <= 200:
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
-        elif AQI >= 200 and AQI <= 300:
-            imgok = open("REDLEVEL.png", "rb")
+        elif AQI >= 201 and AQI <= 1000:
+            imgok = open("PERPELLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "pushki":
@@ -105,8 +105,8 @@ async def sendhourdata(uid, streetid):
         elif AQIPUSH >= 151 and AQIPUSH <= 200:
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
-        elif AQIPUSH >= 200 and AQIPUSH <= 300:
-            imgok = open("REDLEVEL.png", "rb")
+        elif AQIPUSH >= 201 and AQIPUSH <= 1000:
+            imgok = open("PERPELLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "petryu":
@@ -127,8 +127,8 @@ async def sendhourdata(uid, streetid):
         elif AQI >= 151 and AQI <= 200:
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
-        elif AQI >= 200 and AQI <= 300:
-            imgok = open("REDLEVEL.png", "rb")
+        elif AQI >= 201 and AQI <= 1000:
+            imgok = open("PERPELLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "shevch":
@@ -149,8 +149,8 @@ async def sendhourdata(uid, streetid):
         elif AQI >= 151 and AQI <= 200:
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
-        elif AQI >= 200 and AQI <= 300:
-            imgok = open("REDLEVEL.png", "rb")
+        elif AQI >= 201 and AQI <= 1000:
+            imgok = open("PERPELLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "gromad":
@@ -171,8 +171,8 @@ async def sendhourdata(uid, streetid):
         elif AQI >= 151 and AQI <= 200:
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
-        elif AQI >= 200 and AQI <= 300:
-            imgok = open("REDLEVEL.png", "rb")
+        elif AQI >= 201 and AQI <= 1000:
+            imgok = open("PERPELLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
     elif streetid == "velyko":
@@ -193,8 +193,8 @@ async def sendhourdata(uid, streetid):
         elif AQI >= 151 and AQI <= 200:
             imgok = open("REDLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
-        elif AQI >= 200 and AQI <= 300:
-            imgok = open("REDLEVEL.png", "rb")
+        elif AQI >= 201 and AQI <= 1000:
+            imgok = open("PERPELLEVEL.png", "rb")
             await bot.send_photo(uid, imgok, message_to_user, reply_markup=markupdetails)
 
 @dp.message_handler(commands=["start"])
@@ -362,8 +362,8 @@ async def call_back_streetshkil(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 500:
-        imgok = open("REDLEVEL.png", "rb")
+    elif AQI >= 201 and AQI <= 1000:
+        imgok = open("PERPELLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
@@ -391,8 +391,8 @@ async def call_back_streetspushkin(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQIPUSH >= 200 and AQIPUSH <= 500:
-        imgok = open("REDLEVEL.png", "rb")
+    elif AQIPUSH >= 201 and AQIPUSH <= 1000:
+        imgok = open("PERPELLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
@@ -403,7 +403,6 @@ async def call_back_streetpetr(call: types.CallbackQuery):
     message_text = Requesttopage.main("petryur")
     street = "вул. Петра Юрченка"
     AQI = float(message_text[0])
-    print(AQI)
     message_to_user = StreetMessageText.main(float(message_text[0]), float(message_text[1]), street)
     if AQI <=50 :
         imgok = open("OKEVEL.png", "rb")
@@ -421,8 +420,8 @@ async def call_back_streetpetr(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 500:
-        imgok = open("REDLEVEL.png", "rb")
+    elif AQI >= 201 and AQI <= 1000:
+        imgok = open("PERPELLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
@@ -450,8 +449,8 @@ async def call_back_streetshevchenka(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 500:
-        imgok = open("REDLEVEL.png", "rb")
+    elif AQI >= 201 and AQI <= 1000:
+        imgok = open("PERPELLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
@@ -479,8 +478,8 @@ async def call_back_streetsgromad(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 500:
-        imgok = open("REDLEVEL.png", "rb")
+    elif AQI >= 201 and AQI <= 1000:
+        imgok = open("PERPELLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
@@ -508,8 +507,8 @@ async def call_back_streetsvelykotyr(call: types.CallbackQuery):
         imgok = open("REDLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
-    elif AQI >= 200 and AQI <= 500:
-        imgok = open("REDLEVEL.png", "rb")
+    elif AQI >= 201 and AQI <= 1000:
+        imgok = open("PERPELLEVEL.png", "rb")
         await bot.answer_callback_query(call.id)
         await bot.send_photo(call.from_user.id, imgok, message_to_user, reply_markup=markupdetails)
 
