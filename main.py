@@ -58,13 +58,9 @@ DB = DBRequest
 async def hourdatarequesting():
     while True:
         fr = DB.get_uid_streetid_state_array()
-        print(fr)
         for p in fr:
             if "{0}".format(p.split(":")[2]) == "1":
-                print(p.split(":")[0])
-                print(p.split(":")[1])
                 await sendhourdata(p.split(":")[0], p.split(":")[1])
-                print("Function required")
         await asyncio.sleep(3600)
     return 1
 
