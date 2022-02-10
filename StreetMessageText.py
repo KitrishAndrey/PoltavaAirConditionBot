@@ -1,5 +1,11 @@
-import datetime# Імпорт бібліотекі часу
 import requests# Імпорт бібліотекі для зв'язку з сайтом
+from datetime import datetime
+from dateutil import tz
+from_zone = tz.tzutc()
+to_zone = tz.tzlocal()
+utc = datetime.utcnow()
+utc = utc.replace(tzinfo=from_zone)
+central = utc.astimezone(to_zone)
 
 headers={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
          "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"}# Параметри для імітації дії людини
@@ -8,8 +14,8 @@ class   StreetMessageText():
 
     def __init__(self):# Функція ініціалізації змінних
         self.request = requests
-        self.year = datetime.datetime.today().strftime("%Y-%m-%d")
-        self.time = datetime.datetime.today().strftime("%H:%M")
+        self.year = central.strftime("%Y-%m-%d")
+        self.time = central.strftime("%H:%M")
 
     def streetmessagetext(self, AQI, CO2, street):# Функція виводу тексту про стан повітря та індекс AQI
         data = "\n🏙Стан повітря у місті Полтава на вулиці '{0}'\n" \
