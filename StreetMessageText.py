@@ -1,5 +1,4 @@
 import requests# Імпорт бібліотекі для зв'язку з сайтом
-import pytz
 import datetime
 
 headers={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
@@ -9,10 +8,8 @@ class   StreetMessageText():
 
     def __init__(self):# Функція ініціалізації змінних
         self.request = requests
-        self.tz = pytz.timezone("Europe/Kiev")
-        self.ct = datetime.datetime.now(tz=self.tz)
-        self.year = self.ct.strftime("%Y-%m-%d")
-        self.time = self.ct.strftime("%H:%M")
+        self.year = datetime.datetime.now().strftime("%Y-%m-%d")
+        self.time = datetime.datetime.now().strftime("%H:%M")
 
     def streetmessagetext(self, AQI, CO2, street):# Функція виводу тексту про стан повітря та індекс AQI
         data = "\n🏙Стан повітря у місті Полтава на вулиці '{0}'\n" \
@@ -21,7 +18,7 @@ class   StreetMessageText():
                "\n🚙CO2     ➡️ {2} AQI\n" \
                "\n" \
                "\n🕙 Данні станом на: {3} , {4}\n" \
-               "\n📡 Данні представлені: PoltavaAirCondition\n".format(street, AQI, CO2, self.year, self.time)
+               "\n📡 Данні представлені: PoltavaAirCondition.online\n".format(street, AQI, CO2, self.year, self.time)
         return data# Виведення отриманого тексту
 
     def streetmessageprimedata(self, street, streetid):# Функція виводу тексту первинних даних
@@ -40,7 +37,7 @@ class   StreetMessageText():
                     "\n🌀Aтмосферний тиск: {5}гПа\n"\
                     "\n"\
                     "\n🕙 Данні станом на: {6} , {7}\n"\
-                    "\n📡 Данні представлені: PoltavaAirCondition\n".format(street, AQI, CO2, Temp, Hum, Pres, self.year,
+                    "\n📡 Данні представлені: PoltavaAirCondition.online\n".format(street, AQI, CO2, Temp, Hum, Pres, self.year,
                                                                             self.time)
         return primedata# Вивід фінкції
 
