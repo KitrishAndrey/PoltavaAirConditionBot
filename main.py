@@ -2,6 +2,7 @@ import asyncio
 import DBRequest
 import Requesttopage
 import StreetMessageText
+from aiogram.utils.exceptions import BotBlocked
 from aiogram import Bot, Dispatcher, executor, types
 
 # Bot api_token
@@ -56,13 +57,15 @@ DB = DBRequest
 # starting bot
 
 async def hourdatarequesting():
-    while True:
-        fr = DB.get_uid_streetid_state_array()
-        for p in fr:
-            if "{0}".format(p.split(":")[2]) == "1":
-                await sendhourdata(p.split(":")[0], p.split(":")[1])
-        await asyncio.sleep(3600)
-    return 1
+        while True:
+            try:
+                fr = DB.get_uid_streetid_state_array()
+                for p in fr:
+                    if "{0}".format(p.split(":")[2]) == "1":
+                        await sendhourdata(p.split(":")[0], p.split(":")[1])
+                await asyncio.sleep(3600)
+            except BotBlocked:
+                pass
 
 async def sendhourdata(uid, streetid):
     if streetid == "shkilny":
