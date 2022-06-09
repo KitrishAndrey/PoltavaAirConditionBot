@@ -1,5 +1,5 @@
 aiogram==2.9.2
-aiohttp==3.6.2
+aiohttp==3.7.4
 alabaster==0.7.12
 altgraph==0.17
 antiorm==1.2.1
