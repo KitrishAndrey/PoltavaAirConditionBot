@@ -20,16 +20,34 @@ class RequestToDBSend:
                                   headers=headers)# Створення запиту на сайт PoltavaAirCondition.online
         streetid = result.text
         return streetid
+    def get_data_for_charts_array(self, streetid):
+        result = self.request.get(
+            "http://poltavaaircondition.online/bothourstate.php?getdataforchartsarray={}".format(streetid),
+            headers=headers)  # Створення запиту на сайт PoltavaAirCondition.online
+        return json.loads(result.text)
 
     def get_uid_streetid_state_array(self):
         result = self.request.get("http://poltavaaircondition.online/bothourstate.php?getuidstreetidstatearray={}".format(1),
                                   headers=headers)  # Створення запиту на сайт PoltavaAirCondition.online
         return json.loads(result.text)
 
-
     def push_hour_state(self, uid, streetid, state):
         result = self.request.get(
             "http://poltavaaircondition.online/bothourstate.php?pushhourstate={0}:{1}:{2}".format(uid, streetid, state),
+            headers=headers)  # Створення запиту на сайт PoltavaAirCondition.online
+        answer = result.text
+        return answer
+
+    def push_three_hour_state(self, uid, streetid, state):
+        result = self.request.get(
+            "http://poltavaaircondition.online/bothourstate.php?pushthreehourstate={0}:{1}:{2}".format(uid, streetid, state),
+            headers=headers)  # Створення запиту на сайт PoltavaAirCondition.online
+        answer = result.text
+        return answer
+
+    def push_six_hour_state(self, uid, streetid, state):
+        result = self.request.get(
+            "http://poltavaaircondition.online/bothourstate.php?pushsixhourstate={0}:{1}:{2}".format(uid, streetid, state),
             headers=headers)  # Створення запиту на сайт PoltavaAirCondition.online
         answer = result.text
         return answer
@@ -50,6 +68,10 @@ def get_prime_streetid(uid):
     req = RequestToDBSend()# Ініціалізація класу
     return req.get_prime_streetid(uid) # Виведення результату запиту
 
+def get_data_for_charts_array(streetid):
+    req = RequestToDBSend()
+    return req.get_data_for_charts_array(streetid)
+
 def get_uid_streetid_state_array():
     req = RequestToDBSend()# Ініціалізація класу
     return req.get_uid_streetid_state_array() # Виведення результату запиту
@@ -57,6 +79,14 @@ def get_uid_streetid_state_array():
 def push_hour_state(uid, streetid, state):
     req = RequestToDBSend()# Ініціалізація класу
     return req.push_hour_state(uid, streetid, state) # Виведення результату запиту
+
+def push_three_hour_state(uid, streetid, state):
+    req = RequestToDBSend()# Ініціалізація класу
+    return req.push_three_hour_state(uid, streetid, state) # Виведення результату запиту
+
+def push_six_hour_state(uid, streetid, state):
+    req = RequestToDBSend()# Ініціалізація класу
+    return req.push_six_hour_state(uid, streetid, state) # Виведення результату запиту
 
 def push_zero_state(uid):
     req = RequestToDBSend()# Ініціалізація класу
