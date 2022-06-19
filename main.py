@@ -1,5 +1,7 @@
+import os
 import asyncio
 import DBRequest
+import Daydatapdf
 import Requesttopage
 import StreetMessageText
 from aiogram.utils.exceptions import BotBlocked
@@ -19,16 +21,29 @@ markupdetails = types.InlineKeyboardMarkup(row_width=100)
 author = types.InlineKeyboardMarkup(row_width=100)
 primemenu = types.InlineKeyboardMarkup(row_width=100)
 onofmenu = types.InlineKeyboardMarkup(row_width=100)
+timedatamurkup = types.InlineKeyboardMarkup(row_width=100)
+chartsmarkup = types.InlineKeyboardMarkup(row_width=100)
 
 # Main menu
 menuitem = types.InlineKeyboardButton("Якість повітря🌫", callback_data="sensors")
+
 pushkinastreet = types.InlineKeyboardButton("вул. Пушкіна", callback_data="pushkinska")
 petryurstreet = types.InlineKeyboardButton("вул. Петра Юрченка", callback_data="petryur")
 shevstreet = types.InlineKeyboardButton("вул. Шевченка", callback_data="shevchenka")
 gromadstreet = types.InlineKeyboardButton("вул. Громадська", callback_data="gromad")
 shkilnystreet = types.InlineKeyboardButton("Шкільний провулок", callback_data="shkilny")
 velykotyrstreet = types.InlineKeyboardButton("вул. Великотирнівська", callback_data="velykotyr")
-hoursdata = types.InlineKeyboardButton("⏰Повідомляти що години", callback_data="hourdata")
+
+timedata = types.InlineKeyboardButton("⏰Регулярні повідомлення", callback_data="regdata")
+threehourdata = types.InlineKeyboardButton("🕒🔉 Повідомляти кожні 3 години", callback_data="threehourdata")
+sixhourdata = types.InlineKeyboardButton("🕕🔉 Повідомляти кожні 6 годин", callback_data="sixhourdata")
+hoursdata = types.InlineKeyboardButton("🕐🔉 Повідомляти що години", callback_data="hourdata")
+
+charts= types.InlineKeyboardButton("📈 Графік вимірювань 📉", callback_data="сharts")
+pmcodata=  types.InlineKeyboardButton("📊🗂 Покази PM2.5 і CO2 за 24 години", callback_data="pmcodata")
+pmdata=  types.InlineKeyboardButton("📊🗂 Покази PM2.5 за 24 години", callback_data="pmdata")
+codata=  types.InlineKeyboardButton("📊🗂 Покази CO2 за 24 години", callback_data="codata")
+
 towebsite = types.InlineKeyboardButton("🚀Перейти на сайт", callback_data="towebsite",
                                        url='https://poltavaaircondition.online/polution/polutionmap.html')
 primedata = types.InlineKeyboardButton("🧩Первинні дані", callback_data="primedata")
@@ -42,9 +57,13 @@ removesignal = types.InlineKeyboardButton("❌🚫 Вимкнути оповіщ
 #User markups
 markupmainmenu.add(menuitem)
 streets.add(pushkinastreet).add(petryurstreet).add(shevstreet).add(gromadstreet).add(shkilnystreet).add(velykotyrstreet)
-markupdetails.add(hoursdata, towebsite).add(primedata)
+markupdetails.add(timedata, towebsite).add(primedata).add(charts).add(streetsprime)
 author.add(ruditimejun)
 primemenu.add(streetsprime).add(towebsite).add(indexprime)
+
+chartsmarkup.add(pmcodata).add(pmdata).add(codata).add(indexprime)
+
+timedatamurkup.add(hoursdata).add(threehourdata).add(sixhourdata).add(indexprime)
 
 onofmenu.add(removesignal)
 
@@ -66,6 +85,28 @@ async def hourdatarequesting():
                 await asyncio.sleep(3600)
             except BotBlocked:
                 pass
+
+async  def threehourdatarequesting():
+    while True:
+        try:
+            fr = DB.get_uid_streetid_state_array()
+            for p in fr:
+                if "{0}".format(p.split(":")[3]) == "1":
+                    await sendhourdata(p.split(":")[0], p.split(":")[1])
+            await asyncio.sleep(10800)
+        except BotBlocked:
+            pass
+
+async def sixhourdatarequesting():
+    while True:
+        try:
+            fr = DB.get_uid_streetid_state_array()
+            for p in fr:
+                if "{0}".format(p.split(":")[4]) == "1":
+                    await sendhourdata(p.split(":")[0], p.split(":")[1])
+            await asyncio.sleep(21600)
+        except BotBlocked:
+            pass
 
 async def sendhourdata(uid, streetid):
     if streetid == "shkilny":
@@ -217,6 +258,63 @@ async def start(message: types.Message):
     await bot.send_photo(message.chat.id, img, "🏘🚩Оберіть вулицю на якій розташовано бажаний датчик🚩\n",
                          reply_markup=streets)
 
+#charts massage
+
+@dp.callback_query_handler(lambda c: c.data=="сharts")
+async def call_back_street(call: types.CallbackQuery):
+    await bot.answer_callback_query(call.id)
+    img = open("chart.png", 'rb')
+    await bot.send_chat_action(call.from_user.id, "typing")
+    await bot.send_photo(call.from_user.id, img, "📈 Оберіть бажаний графік вимірювань 📊 \n",
+                           reply_markup=chartsmarkup)
+
+@dp.callback_query_handler(lambda c: c.data=="pmcodata")
+async def call_back_street(call: types.CallbackQuery):
+    streetid = DB.get_prime_streetid(call.from_user.id)
+    res = DB.get_data_for_charts_array(streetid)
+    x = []
+    y = []
+    y2 = []
+    for i in res:
+        y.append("{0}".format(i.split(":")[5]))
+        y2.append("{0}".format(i.split(":")[4]))
+        x.append("{0}:{1} {2}".format(i.split(" ")[1].split(":")[0], i.split(" ")[1].split(":")[1], i.split(" ")[0]))
+    name = Daydatapdf.gen_twin_graf(x, y, y2)
+    chart = open(name, "rb")
+    await bot.answer_callback_query(call.id)
+    await bot.send_document(call.from_user.id, chart)
+    os.remove(name)
+
+@dp.callback_query_handler(lambda c: c.data=="pmdata")
+async def call_back_street(call: types.CallbackQuery):
+    streetid = DB.get_prime_streetid(call.from_user.id)
+    res = DB.get_data_for_charts_array(streetid)
+    x = []
+    y2 = []
+    for i in res:
+        y2.append("{0}".format(i.split(":")[4]))
+        x.append("{0}:{1} {2}".format(i.split(" ")[1].split(":")[0], i.split(" ")[1].split(":")[1], i.split(" ")[0]))
+    name = Daydatapdf.gen_pm_graf(x, y2)
+    chart = open(name, "rb")
+    await bot.answer_callback_query(call.id)
+    await bot.send_document(call.from_user.id, chart)
+    os.remove(name)
+
+@dp.callback_query_handler(lambda c: c.data=="codata")
+async def call_back_street(call: types.CallbackQuery):
+    streetid = DB.get_prime_streetid(call.from_user.id)
+    res = DB.get_data_for_charts_array(streetid)
+    x = []
+    y = []
+    for i in res:
+        y.append("{0}".format(i.split(":")[5]))
+        x.append("{0}:{1} {2}".format(i.split(" ")[1].split(":")[0], i.split(" ")[1].split(":")[1], i.split(" ")[0]))
+    name = Daydatapdf.gen_co_graf(x, y)
+    chart = open(name, "rb")
+    await bot.answer_callback_query(call.id)
+    await bot.send_document(call.from_user.id, chart)
+    os.remove(name)
+
 # help message
 @dp.message_handler(commands=["about"])
 async def help(message: types.Message):
@@ -227,7 +325,8 @@ async def help(message: types.Message):
                                             "\n♻    Можливості PoltavaAirConditionbot    ♻\n"
                                             "\n▪Обравши «Якість повітря» Ви потрапите у меню вибору станції моніторингу якості повітря,\n"
                                             "де вам потрібно обрати бажаний датчик✅\n"
-                                            "\n▪Також Ви можете увімкнути регулярне повідомлення про стан повітря на обраній вулиці 🏘 \n"
+                                            "\n▪Також є можливість увімкнути регулярне повідомлення про стан повітря на обраній вулиці 🏘 \n"
+                                            "\n▪Ви можете самостійно обрати періодичність надсилання повідомлень о стані якості повітря 📡\n"
                                             "\n__________♻️❇Фірмові стікери️❇♻__________\n"
                                             "\nhttps://t.me/addstickers/cloudit\n"
                                             "\n▪Автор та дизайнер стікерів - @ruditimejunior\n"
@@ -286,6 +385,13 @@ async def call_back_primedata(call: types.CallbackQuery):
         await bot.answer_callback_query(call.id)
         await bot.send_message(call.from_user.id, StreetMessageText.primedata(street, streetid), reply_markup=primemenu)
 
+
+@dp.callback_query_handler(lambda c: c.data == "regdata")
+async def call_back_timedatachoise(call: types.CallbackQuery):
+    await bot.answer_callback_query(call.id)
+    img = open("ringbell.png", "rb")
+    await bot.send_photo(call.from_user.id, img,"⏰📡Будь ласка, оберіть переодичність надсилання повідомлень📡⏰", reply_markup=timedatamurkup)
+
 @dp.callback_query_handler(lambda c: c.data == "street")
 async def call_back_primedata(call: types.CallbackQuery):
     state = DB.get_prime_streetid(call.from_user.id)
@@ -332,6 +438,66 @@ async def call_back_hourdata(call: types.CallbackQuery):
         DB.push_hour_state(call.from_user.id, streetid, 1)
     await bot.answer_callback_query(call.id)
     await bot.send_message(call.from_user.id, "🖥⏰📡Що годинне оповіщення увімкнуте📡⏰🖥", reply_markup=onofmenu)
+
+@dp.callback_query_handler(lambda c: c.data == "threehourdata")
+async def call_back_hourdata(call: types.CallbackQuery):
+    await bot.send_chat_action(call.from_user.id, "typing")
+    state = DB.get_prime_streetid(call.from_user.id)
+    if state == "shkilny":
+        streetid = "shkilny"
+        DB.push_three_hour_state(call.from_user.id, streetid, 1)
+    elif state == "pushki":
+        streetid = "pushki"
+        await bot.answer_callback_query(call.id)
+        DB.push_three_hour_state(call.from_user.id, streetid, 1)
+    elif state == "petryu":
+        streetid = "petryu"
+        await bot.answer_callback_query(call.id)
+        DB.push_three_hour_state(call.from_user.id, streetid, 1)
+    elif state == "shevch":
+        streetid = "shevch"
+        await bot.answer_callback_query(call.id)
+        DB.push_three_hour_state(call.from_user.id, streetid, 1)
+    elif state == "gromad":
+        streetid = "gromad"
+        await bot.answer_callback_query(call.id)
+        DB.push_three_hour_state(call.from_user.id, streetid, 1)
+    elif state == "velyko":
+        streetid = "velyko"
+        await bot.answer_callback_query(call.id)
+        DB.push_three_hour_state(call.from_user.id, streetid, 1)
+    await bot.answer_callback_query(call.id)
+    await bot.send_message(call.from_user.id, "🖥⏰📡Оповіщення кожні 3 години увімкнуте📡⏰🖥", reply_markup=onofmenu)
+
+@dp.callback_query_handler(lambda c: c.data == "sixhourdata")
+async def call_back_hourdata(call: types.CallbackQuery):
+    await bot.send_chat_action(call.from_user.id, "typing")
+    state = DB.get_prime_streetid(call.from_user.id)
+    if state == "shkilny":
+        streetid = "shkilny"
+        DB.push_six_hour_state(call.from_user.id, streetid, 1)
+    elif state == "pushki":
+        streetid = "pushki"
+        await bot.answer_callback_query(call.id)
+        DB.push_six_hour_state(call.from_user.id, streetid, 1)
+    elif state == "petryu":
+        streetid = "petryu"
+        await bot.answer_callback_query(call.id)
+        DB.push_six_hour_state(call.from_user.id, streetid, 1)
+    elif state == "shevch":
+        streetid = "shevch"
+        await bot.answer_callback_query(call.id)
+        DB.push_six_hour_state(call.from_user.id, streetid, 1)
+    elif state == "gromad":
+        streetid = "gromad"
+        await bot.answer_callback_query(call.id)
+        DB.push_six_hour_state(call.from_user.id, streetid, 1)
+    elif state == "velyko":
+        streetid = "velyko"
+        await bot.answer_callback_query(call.id)
+        DB.push_six_hour_state(call.from_user.id, streetid, 1)
+    await bot.answer_callback_query(call.id)
+    await bot.send_message(call.from_user.id, "🖥⏰📡Оповіщення кожні 6 годин увімкнуте📡⏰🖥", reply_markup=onofmenu)
 
 @dp.callback_query_handler(lambda c: c.data == "removesignal")
 async def call_back_remove_signals(call: types.CallbackQuery):
@@ -533,5 +699,7 @@ async def la_la_la(message):
 
 async def on_startup(x):
   asyncio.create_task(hourdatarequesting())
+  asyncio.create_task(threehourdatarequesting())
+  asyncio.create_task(sixhourdatarequesting())
 
 executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
