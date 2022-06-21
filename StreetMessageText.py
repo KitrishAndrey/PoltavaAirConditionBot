@@ -17,8 +17,8 @@ class   StreetMessageText():
                "\n☁PM2.5  ➡️ {1} AQI\n" \
                "\n🚙CO2     ➡️ {2} AQI\n" \
                "\n" \
-               "\n🕙 Данні станом на: {3} , {4}\n" \
-               "\n📡 Данні представлені: PoltavaAirCondition.online\n".format(street, AQI, CO2, self.year, self.time)
+               "\n🕙 Дані станом на: {3} , {4}\n" \
+               "\n📡 Дані представлені: PoltavaAirCondition.online\n".format(street, AQI, CO2, self.year, self.time)
         return data# Виведення отриманого тексту
 
     def streetmessageprimedata(self, street, streetid):# Функція виводу тексту первинних даних
@@ -36,8 +36,8 @@ class   StreetMessageText():
                     "\n💧Вологість: {4}%\n "\
                     "\n🌀Aтмосферний тиск: {5}гПа\n"\
                     "\n"\
-                    "\n🕙 Данні станом на: {6} , {7}\n"\
-                    "\n📡 Данні представлені: PoltavaAirCondition.online\n".format(street, AQI, CO2, Temp, Hum, Pres, self.year,
+                    "\n🕙 Дані станом на: {6} , {7}\n"\
+                    "\n📡 Дані представлені: PoltavaAirCondition.online\n".format(street, AQI, CO2, Temp, Hum, Pres, self.year,
                                                                             self.time)
         return primedata# Вивід фінкції
 
