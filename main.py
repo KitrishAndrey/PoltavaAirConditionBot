@@ -276,8 +276,8 @@ async def call_back_street(call: types.CallbackQuery):
     y = []
     y2 = []
     for i in res:
-        y.append("{0}".format(i.split(":")[5]))
-        y2.append("{0}".format(i.split(":")[4]))
+        y.append(int("{0}".format(i.split(":")[5])))
+        y2.append(int("{0}".format(i.split(":")[4])))
         x.append("{0}:{1} {2}".format(i.split(" ")[1].split(":")[0], i.split(" ")[1].split(":")[1], i.split(" ")[0]))
     name = Daydatapdf.gen_twin_graf(x, y, y2)
     chart = open(name, "rb")
@@ -292,7 +292,7 @@ async def call_back_street(call: types.CallbackQuery):
     x = []
     y2 = []
     for i in res:
-        y2.append("{0}".format(i.split(":")[4]))
+        y2.append(int("{0}".format(i.split(":")[4])))
         x.append("{0}:{1} {2}".format(i.split(" ")[1].split(":")[0], i.split(" ")[1].split(":")[1], i.split(" ")[0]))
     name = Daydatapdf.gen_pm_graf(x, y2)
     chart = open(name, "rb")
@@ -307,7 +307,7 @@ async def call_back_street(call: types.CallbackQuery):
     x = []
     y = []
     for i in res:
-        y.append("{0}".format(i.split(":")[5]))
+        y.append(int("{0}".format(i.split(":")[5])))
         x.append("{0}:{1} {2}".format(i.split(" ")[1].split(":")[0], i.split(" ")[1].split(":")[1], i.split(" ")[0]))
     name = Daydatapdf.gen_co_graf(x, y)
     chart = open(name, "rb")
