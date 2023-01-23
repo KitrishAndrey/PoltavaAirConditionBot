@@ -6,7 +6,7 @@ from aiogram.utils.exceptions import BotBlocked
 from aiogram import Bot, Dispatcher, executor, types
 
 # Bot api_token
-TOKEN = "5069999254:AAF4IZZu3sK-0qTotl98dkV-SrcHFLF_rx8"
+TOKEN = "-----"
 
 #Delay
 
